@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<style type="text/css">
+
+		.yt-player object,
+		.yt-player iframe{
+			width: 100%;
+		}
+
+		.yt-player .player-controls{
+			height: 40px;
+			position: relative;
+			background: rgba(255, 255, 255, 0.3);
+			border: 2px solid lime;
+		}
+
+		.yt-player .player-controls button{
+			height: 30px;
+			margin: 5px 0 0 0;
+			background: #FFF;
+			border: none;
+			color: #000;
+			border: 2px solid lime;
+		}
+
+		.yt-player .player-controls button:hover{
+			cursor: pointer;
+		}
+
+		.yt-player .play-pause-btn,
+		.yt-player .mute-btn{
+			position: relative;
+			z-index: 1;
+		}
+
+		.yt-player .mute-btn{
+			float: right;
+		}
+
+		.yt-player .scrubber{
+			width: 100%;
+			height: 10px;
+			box-sizing: border-box;
+			padding: 0 100px;
+			position: absolute;
+			top: 15px;
+			left: 0;
+			display: block;
+			background-color: #000;
+		}
+
+		.yt-player .scrubber-progress,
+		.yt-player .scrubber-loaded{
+			width: 0;
+			height: 10px;
+			float: left;
+			position: absolute;
+		}
+
+		.yt-player .scrubber-progress{
+			background-color: #F00;
+			z-index: 2;
+		}
+
+		.yt-player .scrubber-loaded{
+			background-color: orange;
+			z-index: 1;
+		}
+
+		.yt-player .scrubber-progress:hover{
+			cursor: pointer;
+		}
+
+	</style>
+
+	<script type="text/javascript" src="//www.google.com/jsapi"></script>
+	<script type="text/javascript">
+		google.load('swfobject', '2.2');
+	</script>
+</head>
+<body>
+	<div id="player-1" class="yt-player">
+		<!-- The video player will replace this <div> tag. -->
+		<div id="yt-player"></div>
+		<div class="player-controls">
+			<button class="play-pause-btn">Play/Pause</button>
+			<span class="scrubber">
+				<span class="scrubber-loaded"></span>
+				<span class="scrubber-progress"></span>
+			</span>
+			<button class="mute-btn">Mute</button>
+		</div>
+	</div>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script type="text/javascript" src="yt-player.js"></script>
+</body>
+</html>
