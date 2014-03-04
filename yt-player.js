@@ -40,10 +40,7 @@ var YouTubePlayer = (function(){
 		}else{
 
 			$.getScript( '//www.youtube.com/iframe_api');
-
-			window.onYouTubeIframeAPIReady = function(){
-				ytp.player = ytp.createIframePlayer(ytp.videoId, ytp.playerWidth, ytp.playerHieght);
-			}
+			$('.player-controls', this.$el).hide();
 		}
 
 		this.events();
@@ -78,16 +75,16 @@ var YouTubePlayer = (function(){
 		});
 	};
 
-	ytp.createIframePlayer = function(videoId, width, height){
+	ytp.createIframePlayer = function(videoId, width, height, videoElId){
 
-		var player = new YT.Player('yt-player', {
+		var player = new YT.Player(videoElId, {
 			width: width,
 			height: height,
 			videoId: videoId,
 			events: {
-				'onReady': this.onPlayerReady,
-				'onStateChange': this.onPlayerStateChange,
-				'onPlaybackQualityChange': this.onPlayerPlaybackQualityChange,
+//				'onReady': this.onPlayerReady,
+				'onStateChange': this.stateChange,
+//				'onPlaybackQualityChange': this.onPlayerPlaybackQualityChange,
 				'onError': this.onPlayerError
 			}
 		});
@@ -107,7 +104,7 @@ var YouTubePlayer = (function(){
 
 		// The element id of the Flash embed
 		var atts = {
-			id: 'embedd-' + videoElId
+			id: 'embed-' + videoElId
 		};
 
 		// All of the magic handled by SWFObject (http://code.google.com/p/swfobject/)
@@ -116,12 +113,18 @@ var YouTubePlayer = (function(){
 							videoElId, width, height, '9', null, null, params, atts);
 	};
 
-	ytp.initPlayer = function(){
-		this.player = this.loadFlashPlayer(this.videoId, this.videoElId);
+	ytp.initPlayer = function(event){
 
-		// Setup look to listen for player info
-		setInterval(this.updatePlayerInfo, 250);
-		this.updatePlayerInfo();
+		if(this.hasFlash){
+
+			this.player = this.loadFlashPlayer(this.videoId, this.videoElId);
+
+			// Setup look to listen for player info
+			setInterval(this.updatePlayerInfo, 250);
+			this.updatePlayerInfo();
+		}else{
+			this.player = this.createIframePlayer(this.videoId, this.playerWidth, this.playerHeight, this.videoElId);
+		}
 	};
 
 	/**
@@ -129,7 +132,7 @@ var YouTubePlayer = (function(){
 	 */
 	ytp.loadFlashPlayer = function(videoId, elId){
 
-		var player = document.getElementById('embedd-' + elId);
+		var player = document.getElementById('embed-' + elId);
 
 		player.addEventListener('onStateChange', 'onPlayerStateChange');
 		player.addEventListener('onError', 'onPlayerError');
@@ -193,13 +196,6 @@ var YouTubePlayer = (function(){
 	}
 
 	/**
-	 * Play video
-	 */
-	ytp.play = function(){
-		this.player.playVideo();
-	};
-
-	/**
 	 * Stop video
 	 */
 	ytp.stop = function(){
@@ -261,4 +257,10 @@ function onYouTubePlayerReady (event){
 function onPlayerStateChange(event){
 	customPlayer1.stateChange(event);
 	customPlayer2.stateChange(event);
+}
+
+// This method must be called in global scope
+function onYouTubeIframeAPIReady(event){
+	customPlayer1.initPlayer();
+	customPlayer2.initPlayer();
 }
