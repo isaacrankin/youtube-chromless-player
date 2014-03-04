@@ -4,6 +4,12 @@
 
 	<style type="text/css">
 
+		.yt-player{
+			background-color: #CCC;
+			margin-bottom: 3em;
+			border:3px solid purple;
+		}
+
 		.yt-player object,
 		.yt-player iframe{
 			width: 100%;
@@ -81,9 +87,23 @@
 	</script>
 </head>
 <body>
+
 	<div id="player-1" class="yt-player">
 		<!-- The video player will replace this <div> tag. -->
-		<div id="yt-player"></div>
+		<div id="yt-video-1"></div>
+		<div class="player-controls">
+			<button class="play-pause-btn">Play/Pause</button>
+			<span class="scrubber">
+				<span class="scrubber-loaded"></span>
+				<span class="scrubber-progress"></span>
+			</span>
+			<button class="mute-btn">Mute</button>
+		</div>
+	</div>
+
+	<div id="player-2" class="yt-player">
+		<!-- The video player will replace this <div> tag. -->
+		<div id="yt-video-2"></div>
 		<div class="player-controls">
 			<button class="play-pause-btn">Play/Pause</button>
 			<span class="scrubber">

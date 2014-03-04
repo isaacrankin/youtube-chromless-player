@@ -27,24 +27,15 @@ var YouTubePlayer = (function(){
 		this.videoId = options.videoId;
 		this.playerWidth = options.width;
 		this.playerHeight = options.height;
+		this.videoElId = options.videoElId;
 
 		this.hasFlash = _hasFlash();
 
 		if(this.hasFlash){
 
 			google.setOnLoadCallback(function(){
-				ytp.createFlashPlayer(ytp.playerWidth, ytp.playerHeight);
+				ytp.createFlashPlayer(ytp.playerWidth, ytp.playerHeight, ytp.videoElId);
 			});
-
-			window.onYouTubePlayerReady = function(id){
-				ytp.player = ytp.loadFlashPlayer(ytp.videoId);
-
-				// Setup look to listen for player info
-				setInterval(ytp.updatePlayerInfo, 250);
-				ytp.updatePlayerInfo();
-			};
-
-			window.onPlayerStateChange = ytp.onPlayerStateChange;
 
 		}else{
 
@@ -62,11 +53,11 @@ var YouTubePlayer = (function(){
 
 	ytp.events = function(){
 
-		$('.player-controls .play-pause-btn').click(function(e){
+		$('.player-controls .play-pause-btn', ytp.$el).click(function(e){
 			ytp.playPauseToggle();
 		});
 
-		$('.player-controls .mute-btn').click(function(e){
+		$('.player-controls .mute-btn', ytp.$el).click(function(e){
 			ytp.muteToggle();
 		});
 	};
@@ -91,7 +82,7 @@ var YouTubePlayer = (function(){
 	/**
 	 * Create the Flash player embedd
 	 */
-	ytp.createFlashPlayer = function(width, height){
+	ytp.createFlashPlayer = function(width, height, videoElId){
 
 		// Lets Flash from another domain call JavaScript
 		var params = {
@@ -100,21 +91,29 @@ var YouTubePlayer = (function(){
 
 		// The element id of the Flash embed
 		var atts = {
-			id: 'yt-player'
+			id: 'embedd-' + videoElId
 		};
 
 		// All of the magic handled by SWFObject (http://code.google.com/p/swfobject/)
 		swfobject.embedSWF('http://www.youtube.com/apiplayer?' +
 							'version=3&enablejsapi=1&playerapiid=player1',
-							'yt-player', width, height, '9', null, null, params, atts);
+							videoElId, width, height, '9', null, null, params, atts);
+	};
+
+	ytp.initPlayer = function(){
+		this.player = this.loadFlashPlayer(this.videoId, this.videoElId);
+
+		// Setup look to listen for player info
+		setInterval(this.updatePlayerInfo, 250);
+		this.updatePlayerInfo();
 	};
 
 	/**
 	 * Load video into Flash player
 	 */
-	ytp.loadFlashPlayer = function(videoId){
+	ytp.loadFlashPlayer = function(videoId, elId){
 
-		var player = document.getElementById('yt-player');
+		var player = document.getElementById('embedd-' + elId);
 
 		player.addEventListener('onStateChange', 'onPlayerStateChange');
 		player.addEventListener('onError', 'onPlayerError');
@@ -127,7 +126,7 @@ var YouTubePlayer = (function(){
 	/**
 	 * Listen for player state change
 	 */
-	ytp.onPlayerStateChange = function(e){
+	ytp.stateChange = function(e){
 		ytp.duration = ytp.player.getDuration();
 		console.debug(e);
 	};
@@ -162,7 +161,7 @@ var YouTubePlayer = (function(){
 	};
 
 	ytp.resizeScrubber = function(time){
-
+		
 		// Update played bar
 		if(ytp.duration && time > 0 && time < ytp.duration){
 			var perc = Math.round( time/ (ytp.duration/100)*100)/100;
@@ -175,7 +174,7 @@ var YouTubePlayer = (function(){
 
 	ytp.seekVideo = function(){
 		var seconds = Math.round((duration/100)*perc);
-		ytplayer.seekTo(seconds, true);
+		ytp.seekTo(seconds, true);
 	}
 
 	/**
@@ -221,9 +220,30 @@ var YouTubePlayer = (function(){
 	return ytp;
 });
 
-var customPlayer = new YouTubePlayer().init({
+var customPlayer1 = YouTubePlayer().init({
 	element: $('#player-1'),
+	videoElId: 'yt-video-1',
 	videoId: 'N3NDZL1RYKw',
 	width: 600,
 	height: 480
 });
+
+var customPlayer2 = YouTubePlayer().init({
+	element: $('#player-2'),
+	videoElId: 'yt-video-2',
+	videoId: '97pv_kiYhv4',
+	width: 600,
+	height: 480
+});
+
+// This method must be called in global scope
+function onYouTubePlayerReady (event){
+	customPlayer1.initPlayer();
+	customPlayer2.initPlayer();
+}
+
+// This method must be called in global scope
+function onPlayerStateChange(event){
+	customPlayer1.stateChange(event);
+	customPlayer2.stateChange(event);
+}
